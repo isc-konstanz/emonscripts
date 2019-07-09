@@ -10,7 +10,16 @@ for module in ${!emoncms_modules[@]}; do
     branch=${emoncms_modules[$module]}
     if [ ! -d $module ]; then
         echo "- Installing module: $module"
-        git clone -b $branch https://github.com/emoncms/$module.git
+        git clone -b $branch https://github.com/emoncms/$module.git 
+    else
+        echo "- Module $module already exists"
+    fi
+done
+for module in ${!emoncms_isc_modules[@]}; do
+    branch=${emoncms_isc_modules[$module]}
+    if [ ! -d $module ]; then
+        echo "- Installing module: $module"
+        git clone -b $branch https://github.com/isc-konstanz/emoncms-$module.git $module
     else
         echo "- Module $module already exists"
     fi
