@@ -14,6 +14,9 @@ else
 fi
 
 if [ -f $openenergymonitor_dir/emonhub/install.sh ]; then
+    if [ -f $seal_dir/lib/defaults/emonhub.conf ]; then
+        sudo cp $seal_dir/lib/defaults/emonhub.conf /etc/emonhub/emonhub.conf
+    fi
     $openenergymonitor_dir/emonhub/install.sh $emonSD_pi_env
 else
     echo "ERROR: $openenergymonitor_dir/emonhub/install.sh script does not exist"

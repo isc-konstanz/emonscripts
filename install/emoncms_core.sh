@@ -34,8 +34,8 @@ fi
 # Copy and install default.settings.php
 if [ ! -f $emoncms_www/settings.php ]; then
     echo "- installing default emoncms settings.php"
-    if [ -f /opt/seal/lib/defaults/emoncms.settings.php ]; then
-        cp /opt/seal/lib/defaults/emoncms.settings.php $emoncms_www/settings.php
+    if [ -f $seal_dir/lib/defaults/emoncms.settings.php ]; then
+        cp $seal_dir/lib/defaults/emoncms.settings.php $emoncms_www/settings.php
     else
         cp $openenergymonitor_dir/EmonScripts/defaults/emoncms/default.settings.php $emoncms_www/settings.php
         
