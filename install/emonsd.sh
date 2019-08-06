@@ -42,17 +42,17 @@ sudo cp $openenergymonitor_dir/EmonScripts/defaults/etc/cron.daily/logrotate /et
 # Review: provide configuration file for default password and hostname
 
 # Set default SSH password:
-printf "raspberry\n$ssh_password\n$ssh_password" | passwd
+#printf "seal\n$ssh_password\n$ssh_password" | passwd
 
 # Set hostname
-sudo sed -i "s/raspberrypi/$hostname/g" /etc/hosts
-printf $hostname | sudo tee /etc/hostname > /dev/null
+#sudo sed -i "s/raspberrypi/$hostname/g" /etc/hosts
+#printf $hostname | sudo tee /etc/hostname > /dev/null
 
 # --------------------------------------------------------------------------------
 # UFW firewall
 # --------------------------------------------------------------------------------
 # Review: reboot required before running:
-sudo apt-get install -y ufw
+#sudo apt-get install -y ufw
 # sudo ufw allow 80/tcp
 # sudo ufw allow 443/tcp (optional, HTTPS not present)
 # sudo ufw allow 22/tcp
