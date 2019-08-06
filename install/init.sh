@@ -1,7 +1,7 @@
 #!/bin/bash
 
 user=$USER
-openenergymonitor_dir=/opt/openenergymonitor
+openenergymonitor_dir=/opt/oem
 emoncms_dir=/opt/emoncms
 
 sudo apt-get update -y
@@ -15,7 +15,7 @@ sudo chown $user $emoncms_dir
 
 cd $openenergymonitor_dir
 
-git clone -b isc https://github.com/isc-konstanz/EmonScripts.git
+git clone -b seal https://github.com/isc-konstanz/EmonScripts.git
 
 cd $openenergymonitor_dir/EmonScripts/install
 bash ./main.sh

@@ -34,17 +34,21 @@ fi
 # Copy and install default.settings.php
 if [ ! -f $emoncms_www/settings.php ]; then
     echo "- installing default emoncms settings.php"
-    cp $openenergymonitor_dir/EmonScripts/defaults/emoncms/default.settings.php $emoncms_www/settings.php
-    
-    sed -i "s~EMONCMS_DIR~$emoncms_dir~" $emoncms_www/settings.php
-    sed -i "s~OPENENERGYMONITOR_DIR~$openenergymonitor_dir~" $emoncms_www/settings.php
-    
-    sed -i "s~database = \"emoncms\"~database = \"$mysql_database\"~" $emoncms_www/settings.php
-    sed -i "s~username = \"emoncms\"~username = \"$mysql_user\"~" $emoncms_www/settings.php
-    sed -i "s~password = \"emonpiemoncmsmysql2016\"~password = \"$mysql_password\"~" $emoncms_www/settings.php
-    
-    sed -i "s~'user'     => 'emonpi'~'user'     => '$mqtt_user'~" $emoncms_www/settings.php
-    sed -i "s~'password' => 'emonpimqtt2016'~'password' => '$mqtt_password'~" $emoncms_www/settings.php
+    if [ -f /opt/seal/lib/defaults/emoncms.settings.php ]; then
+        cp /opt/seal/lib/defaults/emoncms.settings.php $emoncms_www/settings.php
+    else
+        cp $openenergymonitor_dir/EmonScripts/defaults/emoncms/default.settings.php $emoncms_www/settings.php
+        
+        sed -i "s~EMONCMS_DIR~$emoncms_dir~" $emoncms_www/settings.php
+        sed -i "s~OPENENERGYMONITOR_DIR~$openenergymonitor_dir~" $emoncms_www/settings.php
+        
+        sed -i "s~database = \"emoncms\"~database = \"$mysql_database\"~" $emoncms_www/settings.php
+        sed -i "s~username = \"emoncms\"~username = \"$mysql_user\"~" $emoncms_www/settings.php
+        sed -i "s~password = \"emonpiemoncmsmysql2016\"~password = \"$mysql_password\"~" $emoncms_www/settings.php
+        
+        sed -i "s~'user'     => 'emonpi'~'user'     => '$mqtt_user'~" $emoncms_www/settings.php
+        sed -i "s~'password' => 'emonpimqtt2016'~'password' => '$mqtt_password'~" $emoncms_www/settings.php
+    fi
 else
     echo "- emoncms settings.php already exists"
 fi

@@ -4,7 +4,7 @@
     $server   = "127.0.0.1";
     $database = "emoncms";
     $username = "emoncms";
-    $password = "emonpiemoncmsmysql2016";
+    $password = "emoncms";
     $port     = "3306";
     // Skip database setup test - set to false once database has been setup.
     $dbtest = true;
@@ -24,8 +24,8 @@
     $mqtt_enabled = true;            // Activate MQTT by changing to true
     $mqtt_server = array( 'host'     => 'localhost',
                           'port'     => 1883,
-                          'user'     => 'emonpi',
-                          'password' => 'emonpimqtt2016',
+                          'user'     => 'emonmqtt',
+                          'password' => 'emonmqtt',
                           'basetopic'=> 'emon',
                           'client_id' => 'emoncms'
                           );
@@ -47,8 +47,8 @@
 
         // Redis Low-write mode
         'redisbuffer'=>array(
-            'enabled' => true      // If enabled is true, requires redis enabled and feedwriter service running
-            ,'sleep' => 60          // Number of seconds to wait before write buffer to disk - user selectable option
+            'enabled' => true,       // If enabled is true, requires redis enabled and feedwriter service running
+            'sleep' => 60            // Number of seconds to wait before write buffer to disk - user selectable option
         ),
 
         'csvdownloadlimit_mb' => 25,     // Max csv download size in MB
@@ -82,12 +82,12 @@
     $default_language = 'en_GB';
     
     // Theme location (folder located under Theme/, and must have the same structure as the basic one)
-    $theme = "basic";
+    $theme = "seal";
     // Theme colour options: "standard", "blue", "sun"
     $themecolor = "blue";
 
     // Favicon filenme in Theme/$theme
-    $favicon = "favicon_emonpi.png";
+    $favicon = "favicon.png";
 
     // Use full screen width
     $fullwidth = true;
