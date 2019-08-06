@@ -15,6 +15,9 @@ fi
 
 if [ -f $openenergymonitor_dir/emonhub/install.sh ]; then
     if [ -f $seal_dir/lib/defaults/emonhub.conf ]; then
+        if [ ! -d /etc/emonhub ]; then
+            sudo mkdir /etc/emonhub
+        fi
         sudo cp $seal_dir/lib/defaults/emonhub.conf /etc/emonhub/emonhub.conf
     fi
     $openenergymonitor_dir/emonhub/install.sh $emonSD_pi_env
