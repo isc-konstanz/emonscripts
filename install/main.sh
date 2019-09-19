@@ -14,8 +14,11 @@
 # Format as documentation
 
 #!/bin/bash
-source config.ini
-
+if [ ! -f config.ini ]; then
+    cp emonsd.config.ini config.ini
+fi
+source load_config.sh
+    
 echo "-------------------------------------------------------------"
 echo "EmonSD Install"
 echo "-------------------------------------------------------------"
@@ -28,6 +31,11 @@ read start_confirm
 if [ $start_confirm == "y" ]; then 
     echo "You selected 'yes' to review config"
     echo "Please review config.ini and restart the build script to continue"
+    echo ""
+    echo "    cd $openenergymonitor_dir/EmonScripts/install/"
+    echo "    nano config.ini"
+    echo "    ./main.sh"
+    echo ""
     exit 0
 fi
 
@@ -62,14 +70,18 @@ if [ "$install_redis" = true ]; then $openenergymonitor_dir/EmonScripts/install/
 if [ "$install_mosquitto" = true ]; then $openenergymonitor_dir/EmonScripts/install/mosquitto.sh; fi
 if [ "$install_emoncms_core" = true ]; then $openenergymonitor_dir/EmonScripts/install/emoncms_core.sh; fi
 if [ "$install_emoncms_modules" = true ]; then $openenergymonitor_dir/EmonScripts/install/emoncms_modules.sh; fi
-if [ "$install_emonhub" = true ]; then $openenergymonitor_dir/EmonScripts/install/emonhub.sh; fi
 if [ "$install_emonmuc" = true ]; then $openenergymonitor_dir/EmonScripts/install/emonmuc.sh; fi
+if [ "$install_emonhub" = true ]; then $openenergymonitor_dir/EmonScripts/install/emonhub.sh; fi
 
 if [ "$emonSD_pi_env" = "1" ]; then
     if [ "$install_firmware" = true ]; then $openenergymonitor_dir/EmonScripts/install/firmware.sh; fi
     if [ "$install_emonpilcd" = true ]; then $openenergymonitor_dir/EmonScripts/install/emonpilcd.sh; fi
     if [ "$install_wifiap" = true ]; then $openenergymonitor_dir/EmonScripts/install/wifiap.sh; fi
-    if [ "$install_emonsd" = true ]; then $openenergymonitor_dir/EmonScripts/install/emonsd.sh; fi
+    if [ "$install_emonsd" = true ]; then 
+        $openenergymonitor_dir/EmonScripts/install/emonsd.sh;
+    else
+        $openenergymonitor_dir/EmonScripts/install/non_emonsd.sh;
+    fi
 
     # Enable service-runner update
     # update checks for image type and only runs with a valid image name file in the boot partition
