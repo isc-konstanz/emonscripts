@@ -35,9 +35,13 @@ fi
 if [ ! -f $emoncms_www/settings.ini ]; then
     echo "- installing default emoncms settings.ini"
     cp $openenergymonitor_dir/EmonScripts/defaults/emoncms/emonpi.settings.ini $emoncms_www/settings.ini
-    sed -i "s~EMONCMS_DIR~$emoncms_dir~" $emoncms_www/settings.ini
-    sed -i "s~OPENENERGYMONITOR_DIR~$openenergymonitor_dir~" $emoncms_www/settings.ini
-    sed -i "s~EMONCMS_DATADIR~$emoncms_datadir~" $emoncms_www/settings.ini
+    sed -i "s/emoncms_dir = .*$/emoncms_dir = $emoncms_dir/" $emoncms_www/settings.ini
+    sed -i "s/openenergymonitor_dir = .*$/openenergymonitor_dir = $openenergymonitor_dir/" $emoncms_www/settings.ini
+    sed -i "s/emoncms_datadir = .*$/emoncms_datadir = $emoncms_datadir/" $emoncms_www/settings.ini
+
+    sed -i "s/database = \"emoncms\"/database = \"$mysql_database\"/" $emoncms_www/settings.ini
+    sed -i "s/password = \"emoncms\"/username = \"$mysql_password\"/" $emoncms_www/settings.ini
+    sed -i "s/username = \"emoncms\"/username = \"$mysql_user\"/" $emoncms_www/settings.ini
 else
     echo "- emoncms settings.ini already exists"
 fi
@@ -71,13 +75,12 @@ if [ "$emoncms_www" != "/var/www/emoncms" ]; then
 fi
 if [ ! -d /var/www/html/emoncms ]; then
     echo "- symlinking emoncms folder to /var/www/html/emoncms"
-    sudo -u www-data ln -s $emoncms_www /var/www/html/emoncms
+    sudo ln -s $emoncms_www /var/www/html/emoncms
     
     # Redirect (review)
     echo "- creating redirect to $emoncms_www"
     echo "<?php header('Location: ../emoncms'); ?>" > $emoncms_dir/index.php
     sudo mv $emoncms_dir/index.php /var/www/html/index.php
-    sudo chown www-data /var/www/html/index.php
     sudo rm /var/www/html/index.html
 fi
 
