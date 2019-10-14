@@ -13,7 +13,7 @@ sudo chown $user $oem_dir
 sudo mkdir $emoncms_dir
 sudo chown $user $emoncms_dir
 
-git clone -b seal https://github.com/openenergymonitor/EmonScripts.git $oem_dir/EmonScripts
+git clone -b seal https://github.com/isc-konstanz/EmonScripts.git $oem_dir/EmonScripts
 
 cd $oem_dir/EmonScripts/install
 bash ./main.sh
