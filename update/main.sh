@@ -1,8 +1,7 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR
-# Use same config.ini as the install
-source $DIR/../install/config.ini
+source load_config.sh
 
 echo "-------------------------------------------------------------"
 echo "Update EmonPi stack"
@@ -10,6 +9,7 @@ echo "-------------------------------------------------------------"
 
 type=$1
 firmware=$2
+serial_port=$3
 
 datestr=$(date)
 
@@ -23,6 +23,11 @@ if [ "$EUID" = "0" ] ; then
     # update is being ran mistakenly as root, switch to user
     echo "update running as root, switch to user"
     exit 0
+fi
+
+if [ "$type" == "all" ] || [ "$type" == "emonhub" ]; then
+    echo "Running apt-get update"
+    sudo apt-get update
 fi
 
 if [ "$emonSD_pi_env" = "1" ]; then
@@ -51,6 +56,10 @@ if [ "$emonSD_pi_env" = "1" ]; then
         echo "Display update message on LCD"
         sudo $openenergymonitor_dir/emonpi/lcd/./emonPiLCD_update.py
     fi
+    
+    # Ensure logrotate configuration has correct permissions
+    sudo chown root:pi $openenergymonitor_dir/EmonScripts/defaults/etc/logrotate.d/*
+
 fi
 
 # -----------------------------------------------------------------
@@ -64,6 +73,7 @@ if [ "$type" == "all" ]; then
             cd $openenergymonitor_dir/$repo
             git branch
             git status
+            git fetch --all --prune
             git pull
 			echo
         fi
@@ -88,6 +98,10 @@ if [ "$type" == "all" ] || [ "$type" == "firmware" ]; then
     if [ "$firmware" == "rfm12pi" ]; then
         $openenergymonitor_dir/EmonScripts/update/rfm12pi.sh
 		echo
+    fi
+    
+    if [ "$firmware" == "emontxv3cm" ]; then
+        $openenergymonitor_dir/EmonScripts/update/emontxv3cm.sh $serial_port
     fi
 fi
 
