@@ -57,7 +57,7 @@ if [ ! -d $emoncms_datadir ]; then
 fi
 
 # Create data directories for emoncms feed engines:
-for engine in "phpfina" "phpfiwa" "phptimeseries"; do
+for engine in "mysql" "phpfina" "phpfiwa" "phptimeseries"; do
     if [ ! -d $emoncms_datadir/$engine ]; then
         echo "- create $engine dir"
         sudo mkdir $emoncms_datadir/$engine
