@@ -17,5 +17,10 @@ sudo mysql -e "CREATE DATABASE $mysql_timeseries DEFAULT CHARACTER SET utf8;"
 echo "- Add user:$mysql_user and assign to database:$mysql_database"
 sudo mysql -e "CREATE USER '$mysql_user'@'localhost' IDENTIFIED BY '$mysql_password';\
 GRANT ALL ON $mysql_database.* TO '$mysql_user'@'localhost';\
+FLUSH PRIVILEGES;"
+
+if [ -z "$mysql_timeseries" ]; then
+    sudo mysql -e "CREATE DATABASE $mysql_timeseries DEFAULT CHARACTER SET utf8;\
 GRANT ALL ON $mysql_timeseries.* TO '$mysql_user'@'localhost';\
 FLUSH PRIVILEGES;"
+fi

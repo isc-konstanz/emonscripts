@@ -1,21 +1,19 @@
 #!/bin/bash
 
 user=$USER
-oem_dir=/opt/oem
+emonscripts_dir=/opt/oem/emonscripts
 emoncms_dir=/opt/emoncms
 
 sudo apt-get update -y
 sudo apt-get install -y git-core
 
-sudo mkdir $oem_dir
-sudo chown $user $oem_dir
-
-sudo mkdir $emoncms_dir
+sudo mkdir $emoncms_dir $(dirname "emonscripts_dir"))
 sudo chown $user $emoncms_dir
 
-git clone -b seal https://github.com/isc-konstanz/EmonScripts.git $oem_dir/EmonScripts
+sudo git clone -b seal https://github.com/isc-konstanz/emonscripts.git $emonscripts_dir
+sudo chown $user -R $emonscripts_dir
 
-cd $oem_dir/EmonScripts/install
+cd $emonscripts_dir/install
 bash ./main.sh
 
 cd
