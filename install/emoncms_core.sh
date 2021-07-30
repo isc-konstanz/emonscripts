@@ -33,19 +33,19 @@ fi
 # Copy and install emonpi.settings.ini
 if [ ! -f $emoncms_www/settings.ini ]; then
     echo "- installing default emoncms settings.ini"
-    if [ "$(git rev-parse --abbrev-ref HEAD)" = "seal" ]; then
-        cp $emonscripts_dir/defaults/emoncms/seal.settings.ini $emoncms_www/settings.ini
-    else
-        cp $emonscripts_dir/defaults/emoncms/emonpi.settings.ini $emoncms_www/settings.ini
-    fi
-    sed -i "s~openenergymonitor_dir = .*$~openenergymonitor_dir = $openenergymonitor_dir~" $emoncms_www/settings.ini
-    sed -i "s~emoncms_dir = .*$~emoncms_dir = $emoncms_dir~" $emoncms_www/settings.ini
-    sed -i "s~emoncms_datadir = .*$~emoncms_datadir = $emoncms_datadir~" $emoncms_www/settings.ini
+    cp $emonscripts_dir/defaults/emoncms/seal.settings.ini   $emoncms_www/settings.ini
+    #cp $emonscripts_dir/defaults/emoncms/emonpi.settings.ini $emoncms_www/settings.ini
 
-    sed -i "6s~database = .*$~database = \"$mysql_database\"~" $emoncms_www/settings.ini
-    sed -i "7s~username = .*$~username = \"$mysql_user\"~"     $emoncms_www/settings.ini
-    sed -i "8s~password = .*$~password = \"$mysql_password\"~" $emoncms_www/settings.ini
-    sed -i "s~mysqltimeseries\[password\] = .*$~mysqltimeseries\[password\] = '$mysql_password'~" $emoncms_www/settings.ini
+    sed -i "s~OPENENERGYMONITOR_DIR~$openenergymonitor_dir~" $emoncms_www/settings.ini
+    sed -i "s~EMONCMS_DATADIR~$emoncms_datadir~"             $emoncms_www/settings.ini
+    sed -i "s~EMONCMS_DIR~$emoncms_dir~"                     $emoncms_www/settings.ini
+
+    sed -i "s~MYSQL_DATABASE~$mysql_database~"               $emoncms_www/settings.ini
+    sed -i "s~MYSQL_USERNAME~$mysql_user~"                   $emoncms_www/settings.ini
+    sed -i "s~MYSQL_PASSWORD~$mysql_password~"               $emoncms_www/settings.ini
+
+    sed -i "s~MQTT_USER~$mqtt_user~"                         $emoncms_www/settings.ini
+    sed -i "s~MQTT_PASSWORD~$mqtt_password~"                 $emoncms_www/settings.ini
 else
     echo "- emoncms settings.ini already exists"
 fi
