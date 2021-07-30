@@ -1,14 +1,12 @@
 #!/bin/bash
 
 user=$USER
-emonscripts_dir=/opt/openenergymonitor/emonscripts
-emoncms_dir=/opt/emoncms
+emonscripts_dir=/opt/openenergymonitor/EmonScripts
 
-sudo apt-get update -y
+sudo mkdir -p $(dirname "$emonscripts_dir")
+
+sudo apt-get update
 sudo apt-get install -y git-core
-
-sudo mkdir $emoncms_dir $(dirname "emonscripts_dir"))
-sudo chown $user $emoncms_dir
 
 sudo git clone -b isc https://github.com/isc-konstanz/emonscripts.git $emonscripts_dir
 sudo chown $user -R $emonscripts_dir
@@ -17,4 +15,4 @@ cd $emonscripts_dir/install
 bash ./main.sh
 
 cd
-rm -f init.sh
+rm -f $(readlink -f "${BASH_SOURCE[0]}")
