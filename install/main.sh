@@ -19,8 +19,6 @@ if [ ! -f config.ini ]; then
 fi
 source load_config.sh
 
-emonscripts_dir="$(dirname $(dirname "$0"))"
-
 echo "-------------------------------------------------------------"
 echo "EmonSD Install"
 echo "-------------------------------------------------------------"
@@ -61,7 +59,6 @@ fi
 
 echo "-------------------------------------------------------------"
 sudo apt-get install -y git build-essential python3-pip python3-dev
-echo "-------------------------------------------------------------"
 
 sudo mkdir -p $openenergymonitor_dir
 sudo chown $user $openenergymonitor_dir
@@ -73,8 +70,8 @@ if [ "$install_redis" = true ]; then $emonscripts_dir/install/redis.sh; fi
 if [ "$install_mosquitto" = true ]; then $emonscripts_dir/install/mosquitto.sh; fi
 if [ "$install_emoncms_core" = true ]; then $emonscripts_dir/install/emoncms_core.sh; fi
 if [ "$install_emoncms_modules" = true ]; then $emonscripts_dir/install/emoncms_modules.sh; fi
-if [ "$install_emonmuc" = true ]; then $emonscripts_dir/install/emonmuc.sh; fi
 if [ "$install_emonhub" = true ]; then $emonscripts_dir/install/emonhub.sh; fi
+if [ "$install_emonmuc" = true ]; then $emonscripts_dir/install/emonmuc.sh; fi
 
 if [ "$emonSD_pi_env" = "1" ]; then
     # Required for emonpiLCD, wifi, rfm69pi firmware (review)

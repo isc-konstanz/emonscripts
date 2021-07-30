@@ -12,7 +12,6 @@ sudo mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localh
 # Create the emoncms database using utf8 character decoding:
 echo "- Create $mysql_database database"
 sudo mysql -e "CREATE DATABASE $mysql_database DEFAULT CHARACTER SET utf8;"
-sudo mysql -e "CREATE DATABASE $mysql_timeseries DEFAULT CHARACTER SET utf8;"
 # Add emoncms database, set user permissions
 echo "- Add user:$mysql_user and assign to database:$mysql_database"
 sudo mysql -e "CREATE USER '$mysql_user'@'localhost' IDENTIFIED BY '$mysql_password';\

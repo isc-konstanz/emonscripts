@@ -42,7 +42,7 @@ sudo cp $emonscripts_dir/defaults/etc/cron.daily/logrotate /etc/cron.daily/logro
 # UFW firewall
 # --------------------------------------------------------------------------------
 # Review: reboot required before running:
-#sudo apt-get install -y ufw
+sudo apt-get install -y ufw
 # sudo ufw allow 80/tcp
 # sudo ufw allow 443/tcp (optional, HTTPS not present)
 # sudo ufw allow 22/tcp
