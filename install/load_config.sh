@@ -12,3 +12,5 @@ fi
 if [ -z "$emonscripts_dir" ]; then
     emonscripts_dir="$(dirname $DIR)"
 fi
+setup_dir=/home/$user/.setup
+passwd_file=$setup_dir/passwd.conf

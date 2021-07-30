@@ -25,12 +25,13 @@ echo "-------------------------------------------------------------"
 
 echo "Warning: The default configuration of this script applies"
 echo "significant modification to the underlying system!"
+echo "Reviewing the build configuration is advised."
 echo ""
-read -p "Would you like to review the build script config before starting? (y/n) " start_confirm
+read -p "Do you like to continue? (y/n) " start_confirm
 
-if [ "$start_confirm" != "n" ] && [ "$start_confirm" != "N" ]; then
+if [ "$start_confirm" != "y" ] && [ "$start_confirm" != "Y" ]; then
     echo ""
-    echo "You selected 'yes' to review config"
+    echo "You selected 'no' to review the configuration"
     echo "Please review config.ini and restart the build script to continue"
     echo ""
     echo "    cd $emonscripts_dir/install/"
@@ -62,6 +63,7 @@ sudo apt-get install -y git build-essential python3-pip python3-dev
 
 sudo mkdir -p $openenergymonitor_dir
 sudo chown $user $openenergymonitor_dir
+if [ "$setup_pwd" = true ]; then $emonscripts_dir/install/load_passwd.sh; fi
 
 if [ "$install_apache" = true ]; then $emonscripts_dir/install/apache.sh; fi
 if [ "$install_mysql" = true ]; then $emonscripts_dir/install/mysql.sh; fi
