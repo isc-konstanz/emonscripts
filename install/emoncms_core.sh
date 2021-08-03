@@ -36,6 +36,10 @@ if [ ! -f $emoncms_www/settings.ini ]; then
     cp $emonscripts_dir/defaults/emoncms/seal.settings.ini   $emoncms_www/settings.ini
     #cp $emonscripts_dir/defaults/emoncms/emonpi.settings.ini $emoncms_www/settings.ini
 
+    if [ -f "$setup_dir/smtp.conf" ]; then        
+        sed -i -e "/^\[app\]/e cat /home/pi/.setup/smtp.conf" \
+               -e "/^\[app\]/{x;p;x;}" seal.settings.ini
+    fi
     sed -i "s~OPENENERGYMONITOR_DIR~$openenergymonitor_dir~" $emoncms_www/settings.ini
     sed -i "s~EMONCMS_DATADIR~$emoncms_datadir~"             $emoncms_www/settings.ini
     sed -i "s~EMONCMS_DIR~$emoncms_dir~"                     $emoncms_www/settings.ini
@@ -48,6 +52,14 @@ if [ ! -f $emoncms_www/settings.ini ]; then
     sed -i "s~MQTT_PASSWORD~$mqtt_password~"                 $emoncms_www/settings.ini
 else
     echo "- emoncms settings.ini already exists"
+fi
+
+echo "- initializing emoncms database"
+php $emonscripts_dir/common/emoncmsdbupdate.php
+
+if [ "$setup_init" = true ]; then
+    echo "- creating user $emoncms_user"
+    php $emonscripts_dir/install/emoncms_core.php --dir "$emoncms_www" --password "$emoncms_password"
 fi
 
 if [ ! -d $emoncms_datadir ]; then
@@ -80,7 +92,7 @@ fi
 if [ ! -d /var/www/html/emoncms ]; then
     echo "- symlinking emoncms folder to /var/www/html/emoncms"
     sudo ln -s $emoncms_www /var/www/html/emoncms
-    
+
     # Redirect (review)
     echo "- creating redirect to $emoncms_www"
     echo "<?php header('Location: ../emoncms'); ?>" > $emoncms_dir/index.php
