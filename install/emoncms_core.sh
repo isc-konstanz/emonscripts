@@ -78,12 +78,6 @@ for engine in "mysql" "phpfina" "phpfiwa" "phptimeseries"; do
     fi
 done
 
-if [ ! -d $emoncms_dir ]
-then
-    sudo mkdir $emoncms_dir
-    sudo chown $USER $emoncms_dir
-fi
-
 # Create a symlink to reference emoncms within the web root folder (review):
 if [ "$emoncms_www" != "/var/www/emoncms" ]; then
     echo "- symlinking emoncms folder to /var/www/emoncms"
@@ -95,8 +89,8 @@ if [ ! -d /var/www/html/emoncms ]; then
 
     # Redirect (review)
     echo "- creating redirect to $emoncms_www"
-    echo "<?php header('Location: ../emoncms'); ?>" > $emoncms_dir/index.php
-    sudo mv $emoncms_dir/index.php /var/www/html/index.php
+    echo "<?php header('Location: ../emoncms'); ?>" > $emonscripts_dir/index.php
+    sudo mv $emonscripts_dir/index.php /var/www/html/index.php
     sudo rm /var/www/html/index.html
 fi
 
