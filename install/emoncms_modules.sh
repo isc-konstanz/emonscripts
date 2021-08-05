@@ -47,4 +47,4 @@ if [ -v emoncms_modules[@] ]; then
     done
 fi
 echo "Update Emoncms database"
-php $emonscripts_dir/common/emoncmsdbupdate.php
+php $emonscripts_dir/common/emoncmsdbupdate.php --dir="$emoncms_www"

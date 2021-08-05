@@ -47,6 +47,7 @@ if [ ! -f $emoncms_www/settings.ini ]; then
     sed -i "s~MYSQL_DATABASE~$mysql_database~"               $emoncms_www/settings.ini
     sed -i "s~MYSQL_USERNAME~$mysql_user~"                   $emoncms_www/settings.ini
     sed -i "s~MYSQL_PASSWORD~$mysql_password~"               $emoncms_www/settings.ini
+    sed -i "s~MYSQL_TIMESERIES~$mysql_timeseries~"           $emoncms_www/settings.ini
 
     sed -i "s~MQTT_USER~$mqtt_user~"                         $emoncms_www/settings.ini
     sed -i "s~MQTT_PASSWORD~$mqtt_password~"                 $emoncms_www/settings.ini
@@ -55,11 +56,11 @@ else
 fi
 
 echo "- initializing emoncms database"
-php $emonscripts_dir/common/emoncmsdbupdate.php
+php $emonscripts_dir/common/emoncmsdbupdate.php --dir="$emoncms_www"
 
 if [ "$setup_init" = true ]; then
     echo "- creating user $emoncms_user"
-    php $emonscripts_dir/install/emoncms_core.php --dir "$emoncms_www" --password "$emoncms_password"
+    php $emonscripts_dir/install/emoncms_core.php --dir="$emoncms_www" --password="$emoncms_password"
 fi
 
 if [ ! -d $emoncms_datadir ]; then
@@ -79,7 +80,7 @@ for engine in "mysql" "phpfina" "phpfiwa" "phptimeseries"; do
 done
 
 # Create a symlink to reference emoncms within the web root folder (review):
-if [ "$emoncms_www" != "/var/www/emoncms" ]; then
+if [ ! -d /var/www/emoncms ] && [ var/www/emoncms != "$emoncms_www" ]; then
     echo "- symlinking emoncms folder to /var/www/emoncms"
     sudo ln -s $emoncms_www /var/www/emoncms
 fi

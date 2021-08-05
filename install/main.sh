@@ -61,9 +61,12 @@ fi
 echo "-------------------------------------------------------------"
 sudo apt-get install -y git build-essential python3-pip python3-dev
 
+if [ "$setup_pwd" = true ]; then
+    sudo apt-get install -y pwgen
+fi
+
 sudo mkdir -p $openenergymonitor_dir
 sudo chown $user $openenergymonitor_dir
-if [ "$setup_pwd" = true ]; then $emonscripts_dir/install/load_passwd.sh; fi
 
 if [ "$install_apache" = true ]; then $emonscripts_dir/install/apache.sh; fi
 if [ "$install_mysql" = true ]; then $emonscripts_dir/install/mysql.sh; fi
