@@ -18,18 +18,40 @@ else
 fi
 sudo bash $emonmuc_dir/setup.sh --emoncms $emoncms_www
 
-cp -fp  $emonscripts_dir/defaults/emonmuc/emoncms.conf $openmuc_dir/conf/emoncms.conf
-sed -i "s/MYSQL_DATABASE/$mysql_timeseries/"           $openmuc_dir/conf/emoncms.conf
+sudo cp -f $emonscripts_dir/defaults/emonmuc/emoncms.conf $openmuc_dir/conf/emoncms.conf
 
-sed -i "s/MYSQL_USER/$mysql_user/"                     $openmuc_dir/conf/emoncms.conf
-sed -i "s/MYSQL_PASSWORD/$mysql_password/"             $openmuc_dir/conf/emoncms.conf
+sudo sed -i "s/MYSQL_DATABASE/$mysql_timeseries/"         $openmuc_dir/conf/emoncms.conf
 
-sed -i "s/MQTT_USER/$mqtt_user/"                       $openmuc_dir/conf/emoncms.conf
-sed -i "s/MQTT_PASSWORD/$mqtt_password/"               $openmuc_dir/conf/emoncms.conf
+sudo sed -i "s/MYSQL_USER/$mysql_user/"                   $openmuc_dir/conf/emoncms.conf
+sudo sed -i "s/MYSQL_PASSWORD/$mysql_password/"           $openmuc_dir/conf/emoncms.conf
+
+sudo sed -i "s/MQTT_USER/$mqtt_user/"                     $openmuc_dir/conf/emoncms.conf
+sudo sed -i "s/MQTT_PASSWORD/$mqtt_password/"             $openmuc_dir/conf/emoncms.conf
+
+openmuc_user=`stat -c "%U" "$openmuc_dir"/bin/openmuc`
 
 if [ "$setup_init" = true ]; then
-    emonmuc_port_key="org.osgi.service.http.port"
-    emonmuc_port=`grep -m 1 $emonmuc_port_key $openmuc_dir/conf/system.properties | sed "s/${emonmuc_port_key}.*=//;s/^[ \t]*//g"`
+    openmuc_port_key="org.osgi.service.http.port"
+    openmuc_port=`grep -m 1 $openmuc_port_key $openmuc_dir/conf/system.properties | sed "s/${openmuc_port_key}.*=//;s/^[ \t]*//g"`
 
-    php $emonscripts_dir/install/emonmuc.php --dir="$emoncms_www" --port="$emonmuc_port"
+    # Wait a while for the server to be available.
+    # TODO: Explore necessity. May be necessary for Raspberry Pi V1
+    printf "Waiting for openmuc service\nPlease wait"
+
+    wait=0
+    while ! nc -z localhost $openmuc_port && [ $wait -lt 60 ]; do
+        wait=$((wait + 3))
+        sleep 3
+        printf "."
+    done
+    while [ $wait -lt 9 ]; do
+        wait=$((wait + 3))
+        sleep 3
+        printf "."
+    done
+    printf "\n"
+
+    sudo php $emonscripts_dir/install/emonmuc.php --dir="$emoncms_www" --port="$openmuc_port"
 fi
+sudo chown $openmuc_user -R "$openmuc_dir"/conf
+sudo systemctl restart openmuc.service
