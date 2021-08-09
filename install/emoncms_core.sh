@@ -36,9 +36,9 @@ if [ ! -f $emoncms_www/settings.ini ]; then
     cp $emonscripts_dir/defaults/emoncms/seal.settings.ini   $emoncms_www/settings.ini
     #cp $emonscripts_dir/defaults/emoncms/emonpi.settings.ini $emoncms_www/settings.ini
 
-    if [ -f "$setup_dir/smtp.conf" ]; then        
+    if [ -f "$setup_dir/smtp.conf" ]; then
         sed -i -e "/^\[app\]/e cat /home/pi/.setup/smtp.conf" \
-               -e "/^\[app\]/{x;p;x;}" seal.settings.ini
+               -e "/^\[app\]/{x;p;x;}"                       $emoncms_www/settings.ini
     fi
     sed -i "s~OPENENERGYMONITOR_DIR~$openenergymonitor_dir~" $emoncms_www/settings.ini
     sed -i "s~EMONCMS_DATADIR~$emoncms_datadir~"             $emoncms_www/settings.ini
