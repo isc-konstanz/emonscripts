@@ -35,17 +35,16 @@ try {
     require_once "Modules/muc/muc_model.php";
     $ctrl = new Controller($mysqli, $redis);
 
-    if (count($ctrl->get_list($userid)) > 0) {
+    if (count($ctrl->get_list($userid)) < 1) {
         // Only register controller, if none exists jet
-        die;
+        if (isset($options['p']) || isset($options['port'])) {
+            $port = isset($options['p']) ? $options['p'] : $options['port'];;
+        }
+        else {
+            $port = 8080;
+        }
+        $ctrl->create($userid, 'http', 'Local', '', '{"address":"localhost","port":'.$port.'}');
     }
-    if (isset($options['p']) || isset($options['port'])) {
-        $port = isset($options['p']) ? $options['p'] : $options['port'];;
-    }
-    else {
-        $port = 8080;
-    }
-    $ctrl->create($userid, 'http', 'Local', '', '{"address":"localhost","port":'.$port.'}');
 
     if (!is_writable('/opt/openmuc/conf') || (is_file('/opt/openmuc/conf/emoncms.conf') && !is_writable('/opt/openmuc/conf/emoncms.conf'))) {
         echo "Unable to edit emoncms configution file in /opt/openmuc/conf\n";
