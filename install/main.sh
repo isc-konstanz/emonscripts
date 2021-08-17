@@ -15,7 +15,7 @@
 
 #!/bin/bash
 if [ ! -f config.ini ]; then
-    cp emonsd.config.ini config.ini
+    cp seal.config.ini config.ini
 fi
 source load_config.sh
 
