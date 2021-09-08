@@ -28,10 +28,8 @@ if [ "$install_mysql" = true ]; then
     if grep -A3 -P "^\[MySQL\]$" $passwd_file | grep -m1 -q "$mysql_user"; then
         mysql_password=`grep -A3 -P "^\[MySQL\]$" $passwd_file | grep -m1 "$mysql_user:" |\
                         sed "s/$mysql_user://g" | sed -r "s/\s+//g"`
-    else
-        if $pwgen_installed; then
-            mysql_password=$(pwgen -s1 32)
-        fi
+    elif $pwgen_installed; then
+		mysql_password=$(pwgen -s1 32)
         echo "$mysql_user:$mysql_password" >> $passwd_file
     fi
 fi
@@ -42,10 +40,8 @@ if [ "$install_mosquitto" = true ]; then
     if grep -A3 -P "^\[MQTT\]$" $passwd_file | grep -m1 -q "$mqtt_user"; then
         mqtt_password=`grep -A3 -P "^\[MQTT\]$" $passwd_file | grep -m1 "$mqtt_user:" |\
                         sed "s/$mqtt_user://g" | sed -r "s/\s+//g"`
-    else
-        if $pwgen_installed; then
-            mqtt_password=$(pwgen -s1 32)
-        fi
+    elif $pwgen_installed; then
+        mqtt_password=$(pwgen -s1 32)
         echo "$mqtt_user:$mqtt_password" >> $passwd_file
     fi
 fi
@@ -59,10 +55,8 @@ if [ "$setup_init" = true ]; then
     if grep -A3 -P "^\[Emoncms\]$" $passwd_file | grep -m1 -q "$emoncms_user"; then
         emoncms_password=`grep -A3 -P "^\[Emoncms\]$" $passwd_file | grep -m1 "$emoncms_user:" |\
                         sed "s/$emoncms_user://g" | sed -r "s/\s+//g"`
-    else
-        if $pwgen_installed; then
-            emoncms_password=$(pwgen -s1 10)
-        fi
+    elif $pwgen_installed; then
+        emoncms_password=$(pwgen -s1 10)
         echo "$emoncms_user:$emoncms_password" >> $passwd_file
     fi
 fi
