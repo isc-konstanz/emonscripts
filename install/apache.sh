@@ -20,4 +20,9 @@ sudo cp $emonscripts_dir/defaults/apache2/emoncms.conf /etc/apache2/sites-availa
 sudo a2dissite 000-default.conf
 sudo a2ensite emoncms
 
+seal_id=$(cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2 | cut -c9-16)
+seal_domain="$seal_id.seal.isc-konstanz.de"
+if ! grep -q $seal_domain                                    /etc/apache2/sites-available/emoncms.conf; then
+    sudo sed -i "/ServerName/a\    ServerAlias $seal_domain" /etc/apache2/sites-available/emoncms.conf
+fi
 sudo systemctl restart apache2
