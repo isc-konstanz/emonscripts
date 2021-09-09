@@ -1,5 +1,9 @@
 #!/bin/bash
-pwgen_installed=$(dpkg -l | grep -q -e pwgen)
+if $(dpkg -l | grep -q -e pwgen); then
+	pwgen_installed=true
+else
+    pwgen_installed=false
+fi
 
 setup_dir=/home/$user/.setup
 if [ ! -d $setup_dir ]; then
@@ -30,7 +34,9 @@ if [ "$install_mysql" = true ]; then
                         sed "s/$mysql_user://g" | sed -r "s/\s+//g"`
     elif $pwgen_installed; then
 		mysql_password=$(pwgen -s1 32)
-        echo "$mysql_user:$mysql_password" >> $passwd_file
+        sed -i "/\[MySQL\]/{
+N;a $mysql_user:$mysql_password
+}" $passwd_file
     fi
 fi
 if [ "$install_mosquitto" = true ]; then
@@ -39,10 +45,10 @@ if [ "$install_mosquitto" = true ]; then
     fi
     if grep -A3 -P "^\[MQTT\]$" $passwd_file | grep -m1 -q "$mqtt_user"; then
         mqtt_password=`grep -A3 -P "^\[MQTT\]$" $passwd_file | grep -m1 "$mqtt_user:" |\
-                        sed "s/$mqtt_user://g" | sed -r "s/\s+//g"`
+                       sed "s/$mqtt_user://g" | sed -r "s/\s+//g"`
     elif $pwgen_installed; then
         mqtt_password=$(pwgen -s1 32)
-        echo "$mqtt_user:$mqtt_password" >> $passwd_file
+        sed -i "\[MQTT\]/a $mqtt_user:$mqtt_password" $passwd_file
     fi
 fi
 
@@ -57,6 +63,6 @@ if [ "$setup_init" = true ]; then
                         sed "s/$emoncms_user://g" | sed -r "s/\s+//g"`
     elif $pwgen_installed; then
         emoncms_password=$(pwgen -s1 10)
-        echo "$emoncms_user:$emoncms_password" >> $passwd_file
+        sed -i "/\[Emoncms\]/a $emoncms_user:$emoncms_password" $passwd_file
     fi
 fi
