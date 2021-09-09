@@ -61,8 +61,9 @@ try {
     }
 
     $contents = file_get_contents($config);
-    $contents = str_replace(';authorization = WRITE', 'authorization = WRITE', $contents);
-    $contents = str_replace(';authentication = API_KEY', 'authentication = '.$apikey, $contents);
+    $contents = str_replace(';authorization', 'authorization', $contents);
+    $contents = str_replace(';authentication', 'authentication', $contents);
+    $contents = str_replace('authentication = API_KEY', 'authentication = '.$apikey, $contents);
     file_put_contents('/opt/openmuc/conf/emoncms.conf', $contents);
 }
 catch(Exception $e) {
