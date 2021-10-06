@@ -13,5 +13,5 @@ if [ -z "$emonscripts_dir" ]; then
     emonscripts_dir="$(dirname $DIR)"
 fi
 if [ $setup_pwd = true ]; then 
-    source load_passwd.sh
+    source $DIR/load_passwd.sh
 fi
