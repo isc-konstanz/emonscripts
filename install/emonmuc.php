@@ -1,15 +1,74 @@
 <?php
-$root_dir = dirname(dirname(__FILE__));
+define('EMONCMS_EXEC', 1);
 
-$options_short = "a::";
+$options_short = "d::";
 $options_short .= "p::";
+$options_short .= "a::";
 $options_long  = array(
-    "apikey::",
-    "port::"
+    "dir:",
+    "port::",
+    "apikey::"
 );
 $options = getopt($options_short, $options_long);
 
-require_once "$root_dir/common/emoncmscore.php";
+if (isset($options['d'])) {
+    $dir = $options['d'];
+}
+else if (isset($options['dir'])) {
+    $dir = $options['dir'];
+}
+else {
+    $dir = "/var/www/emoncms";
+}
+if(substr_compare($dir, '/', strlen($dir)-1, 1) !== 0) {
+    $dir = $dir."/";
+}
+chdir($dir);
+require "process_settings.php";
+require "core.php";
+
+require_once "Lib/EmonLogger.php";
+
+# Check MySQL PHP modules are loaded
+if (!extension_loaded('mysql') && !extension_loaded('mysqli')){
+    echo "Your PHP installation appears to be missing the MySQL extension(s) which are required by Emoncms."; die;
+}
+
+# Check Gettext PHP  module is loaded
+if (!extension_loaded('gettext')){
+    echo "Your PHP installation appears to be missing the gettext extension which is required by Emoncms."; die;
+}
+$mysqli = @new mysqli(
+    $settings['sql']['server'],
+    $settings['sql']['username'],
+    $settings['sql']['password'],
+    $settings['sql']['database'],
+    $settings['sql']['port']
+    );
+if ($mysqli->connect_error) {
+    echo "Can't connect to database, please verify credentials/configuration in settings.php"; die;
+}
+// Set charset to utf8
+$mysqli->set_charset("utf8");
+
+if ($settings['redis']['enabled']) {
+    $redis = new Redis();
+    $connected = $redis->connect($settings['redis']['host'], $settings['redis']['port']);
+    if (!$connected) { echo "Can't connect to redis at ".$settings['redis']['host'].":".$settings['redis']['port']." , it may be that redis-server is not installed or started see readme for redis installation"; die; }
+    if (!empty($settings['redis']['prefix'])) $redis->setOption(Redis::OPT_PREFIX, $settings['redis']['prefix']);
+    if (!empty($settings['redis']['auth'])) {
+        if (!$redis->auth($settings['redis']['auth'])) {
+            echo "Can't connect to redis at ".$settings['redis']['host'].", autentication failed"; die;
+        }
+    }
+    if (!empty($settings['redis']['dbnum'])) {
+        $redis->select($settings['redis']['dbnum']);
+    }
+}
+else {
+    $redis = false;
+}
+
 require_once "Modules/user/user_model.php";
 $user = new User($mysqli, $redis);
 
@@ -34,9 +93,9 @@ if (!is_dir('/opt/openmuc')) {
 try {
     require_once "Modules/muc/muc_model.php";
     $ctrl = new Controller($mysqli, $redis);
-
+    
+    // Only register controller, if none exists jet
     if (count($ctrl->get_list($userid)) < 1) {
-        // Only register controller, if none exists jet
         if (isset($options['p']) || isset($options['port'])) {
             $port = isset($options['p']) ? $options['p'] : $options['port'];;
         }
@@ -45,18 +104,10 @@ try {
         }
         $ctrl->create($userid, 'http', 'Local', '', '{"address":"localhost","port":'.$port.'}');
     }
-
-    if (!is_writable('/opt/openmuc/conf') || (is_file('/opt/openmuc/conf/emoncms.conf') && !is_writable('/opt/openmuc/conf/emoncms.conf'))) {
-        echo "Unable to edit emoncms configution file in /opt/openmuc/conf\n";
-        die;
-    }
     $config = '/opt/openmuc/conf/emoncms.conf';
 
-    if (!is_file($config)) {
-        $config = $root_dir.'/conf/emoncms.default.conf';
-    }
-    if (!is_file($config)) {
-        echo "Unable to find default emoncms configuration $config\n";
+    if (!is_writable('/opt/openmuc/conf') || (is_file($config) && !is_writable($config))) {
+        echo "Unable to edit emoncms configution file in /opt/openmuc/conf\n";
         die;
     }
 
@@ -64,7 +115,7 @@ try {
     $contents = str_replace(';authorization', 'authorization', $contents);
     $contents = str_replace(';authentication', 'authentication', $contents);
     $contents = str_replace('authentication = API_KEY', 'authentication = '.$apikey, $contents);
-    file_put_contents('/opt/openmuc/conf/emoncms.conf', $contents);
+    file_put_contents($config, $contents);
 }
 catch(Exception $e) {
     echo "Unable to register controller for user $userid: ".$e->getMessage()."\n";
