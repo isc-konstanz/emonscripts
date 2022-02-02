@@ -32,7 +32,7 @@ cp $build_tmp/emoncms/default-settings.ini $package_build
 cp $build_tmp/emoncms/default-settings.php $package_build
 cp $build_tmp/emoncms/settings.env.ini $package_build
 
-cp $defaults_dir/emoncms/emonpi.settings.ini $package_build/settings.ini
+cp $defaults_dir/emoncms/seal.settings.ini $package_build/settings.ini
 
 sed -i '/openenergymonitor_dir/d' $package_build/settings.ini
 sed -i '/emoncms_dir/d'           $package_build/settings.ini
