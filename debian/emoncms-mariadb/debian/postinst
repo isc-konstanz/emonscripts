@@ -78,14 +78,13 @@ case "$1" in
         # Create the emoncms database using utf8 character decoding:
         $mysql -e "CREATE DATABASE IF NOT EXISTS $mysql_database_value DEFAULT CHARACTER SET utf8;"
 
-        # Create the emoncms timeseries using utf8 character decoding:
-        $mysql -e "CREATE DATABASE IF NOT EXISTS $mysql_timeseries_value DEFAULT CHARACTER SET utf8;"
-
         # Add emoncms database, set user permissions
         $mysql -e "CREATE USER IF NOT EXISTS '$mysql_user_value'@'localhost' IDENTIFIED BY '$mysql_password_value';"
         $mysql -e "GRANT ALL ON $mysql_database_value.* TO '$mysql_user_value'@'localhost';"
 
         if grep -A6 -P "^\[sql\]$" $SETTINGS_FILE | grep -q $mysql_timeseries_key ; then
+	        # Create the emoncms timeseries using utf8 character decoding:
+	        $mysql -e "CREATE DATABASE IF NOT EXISTS $mysql_timeseries_value DEFAULT CHARACTER SET utf8;"
             $mysql -e "GRANT ALL ON $mysql_timeseries_value.* TO '$mysql_user_value'@'localhost';"
         fi
         $mysql -e "FLUSH PRIVILEGES;"
