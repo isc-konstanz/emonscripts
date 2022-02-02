@@ -1,0 +1,35 @@
+Template: emoncms/mysql_server
+Type: string
+Default: 127.0.0.1
+Description: MySQL server name:
+ Enter the host name of the MySQL database
+
+Template: emoncms/mysql_port
+Type: string
+Default: 3306
+Description: MySQL port:
+ Enter the port of the MySQL database
+
+Template: emoncms/mysql_database
+Type: string
+Default: emoncms
+Description: MySQL database name:
+ Enter the name of the MySQL database
+
+Template: emoncms/mysql_timeseries
+Type: string
+Default: emondata
+Description: MySQL timeseries name:
+ Enter the timeseries name of the timeseries database
+
+Template: emoncms/mysql_user
+Type: string
+Default: emoncms
+Description: MySQL user name:
+ Enter the name for the user of the MySQL database
+
+Template: emoncms/mysql_password
+Type: password
+Default: 
+Description: MySQL user password:
+ Enter the password for the user of the MySQL database

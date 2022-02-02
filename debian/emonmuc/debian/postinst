@@ -1,0 +1,22 @@
+#!/bin/sh
+set -e
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+db_get emoncms/user
+user=$RET
+if [ -n "$user" ]; then
+    user="root"
+fi
+chown -R $user "/var/opt/emonmuc"
+chown -R $user "<root_dir>/Modules/muc"
+chown -R $user "<root_dir>/Modules/channel"
+chown -R $user "<root_dir>/Theme/seal"
+
+#DEBHELPER#
+
+php -f "<root_dir>/scripts/database_update.php"
+php -f "<root_dir>/scripts/device_update.php"
+
+exit 0

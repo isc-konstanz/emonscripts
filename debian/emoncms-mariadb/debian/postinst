@@ -1,0 +1,89 @@
+#!/bin/sh
+set -e
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+SETTINGS_FILE=<root_dir>/settings.ini
+
+case "$1" in
+    install | configure)
+        mysql_header_line=$((`grep -m1 -n "\[sql\]$" $SETTINGS_FILE | sed "s/:.*//g"` - 1))
+        smtp_header_line=$((`grep -m1 -n "\[smtp\]$" $SETTINGS_FILE | sed "s/:.*//g"` - 1))
+
+        db_get emoncms/mysql_server
+        mysql_server_value=$RET
+        mysql_server_key="server"
+        mysql_server_line=$((`grep -A6 -P "^\[sql\]$" $SETTINGS_FILE | grep -m1 -n "$mysql_server_key.*=" | sed "s/:.*//g"` + $mysql_header_line))
+
+        db_get emoncms/mysql_port
+        mysql_port_value=$RET
+        mysql_port_key="port"
+        mysql_port_line=$((`grep -A6 -P "^\[sql\]$" $SETTINGS_FILE | grep -m1 -n "$mysql_port_key.*=" | sed "s/:.*//g"` + $mysql_header_line))
+
+        db_get emoncms/mysql_database
+        mysql_database_value=$RET
+        mysql_database_key="database"
+        mysql_database_line=$((`grep -A6 -P "^\[sql\]$" $SETTINGS_FILE | grep -m1 -n "$mysql_database_key.*=" | sed "s/:.*//g"` + $mysql_header_line))
+
+        db_get emoncms/mysql_timeseries
+        mysql_timeseries_value=$RET
+        mysql_timeseries_key="timeseries"
+        mysql_timeseries_line=$((`grep -A6 -P "^\[sql\]$" $SETTINGS_FILE | grep -m1 -n "$mysql_timeseries_key.*=" | sed "s/:.*//g"` + $mysql_header_line))
+
+        db_get emoncms/mysql_user
+        mysql_user_value=$RET
+        mysql_user_key="username"
+        mysql_user_line=$((`grep -A6 -P "^\[sql\]$" $SETTINGS_FILE | grep -m1 -n "$mysql_user_key.*=" | sed "s/:.*//g"` + $mysql_header_line))
+
+        db_get emoncms/mysql_password
+        mysql_password_value=$RET
+        mysql_password_key="password"
+        mysql_password_line=$((`grep -A6 -P "^\[sql\]$" $SETTINGS_FILE | grep -m1 -n "$mysql_password_key.*=" | sed "s/:.*//g"` + $mysql_header_line))
+
+        sed -i "$mysql_database_line s/.*$mysql_database_key.*=.*/$mysql_database_key = '$mysql_database_value'/" $SETTINGS_FILE
+        sed -i "$mysql_server_line s/.*$mysql_server_key.*=.*/$mysql_server_key = '$mysql_server_value'/"         $SETTINGS_FILE
+        sed -i "$mysql_user_line s/.*$mysql_user_key.*=.*/$mysql_user_key = '$mysql_user_value'/"                 $SETTINGS_FILE
+        sed -i "$mysql_password_line s/.*$mysql_password_key.*=.*/$mysql_password_key = '$mysql_password_value'/" $SETTINGS_FILE
+        if grep -A6 -P "^\[sql\]$" $SETTINGS_FILE | grep -q $mysql_port_key ; then
+            sed -i "$mysql_port_line s/.*$mysql_port_key.*=.*/$mysql_port_key = '$mysql_port_value'/"             $SETTINGS_FILE
+        fi
+        if grep -A6 -P "^\[sql\]$" $SETTINGS_FILE | grep -q $mysql_timeseries_key ; then
+            sed -i "$mysql_timeseries_line s/.*$mysql_timeseries_key.*=.*/$mysql_timeseries_key = '$mysql_timeseries_value'/" $SETTINGS_FILE
+        fi
+        ;;
+    *)
+        ;;
+esac
+case "$1" in
+    install)
+        # Secure mysql
+        mysql -uroot -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+        mysql -uroot  -e "DELETE FROM mysql.user WHERE User='';"
+        mysql -uroot  -e "DROP DATABASE IF EXISTS test;"
+        mysql -uroot  -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%';"
+
+        # Create the emoncms database using utf8 character decoding:
+        mysql -uroot -e "CREATE DATABASE IF NOT EXISTS $mysql_database_value DEFAULT CHARACTER SET utf8;"
+
+        # Create the emoncms timeseries using utf8 character decoding:
+        mysql -uroot -e "CREATE DATABASE IF NOT EXISTS $mysql_timeseries_value DEFAULT CHARACTER SET utf8;"
+
+        # Add emoncms database, set user permissions
+        mysql -uroot -e "CREATE USER IF NOT EXISTS '$mysql_user_value'@'localhost' IDENTIFIED BY '$mysql_password_value';"
+        mysql -uroot -e "GRANT ALL ON $mysql_database_value.* TO '$mysql_user_value'@'localhost';"
+        
+        if grep -A6 -P "^\[sql\]$" $SETTINGS_FILE | grep -q $mysql_timeseries_key ; then
+            mysql -uroot -e "GRANT ALL ON $mysql_timeseries_value.* TO '$mysql_user_value'@'localhost';"
+        fi
+        mysql -uroot -e "FLUSH PRIVILEGES;"
+        ;;
+    *)
+        ;;
+esac
+
+#DEBHELPER#
+
+php -f "<root_dir>/scripts/database_update.php"
+
+exit 0

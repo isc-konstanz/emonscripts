@@ -1,0 +1,19 @@
+#!/usr/bin/dh-exec
+Lib <root_dir>/
+Modules <root_dir>/
+Theme <root_dir>/
+scripts <root_dir>/
+
+.htaccess <root_dir>/
+version.* <root_dir>/
+index.php <root_dir>/
+core.php <root_dir>/
+route.php <root_dir>/
+param.php <root_dir>/
+locale.php <root_dir>/
+php-info.php <root_dir>/
+process_settings.php <root_dir>/
+default-settings.php <root_dir>/
+default-settings.ini <root_dir>/
+settings.env.ini <root_dir>/
+settings.ini <root_dir>/

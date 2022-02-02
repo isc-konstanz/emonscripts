@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+#DEBHELPER#
+
+case "$1" in
+    remove)
+        systemctl reload apache2
+        ;;
+    *)
+        ;;
+esac
+
+exit 0

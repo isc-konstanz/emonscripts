@@ -1,0 +1,53 @@
+#!/bin/sh
+set -e
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+SETTINGS_FILE=<root_dir>/settings.ini
+
+if [ -e $SETTINGS_FILE ]; then
+    mysql_server_key="server"
+    mysql_server_value=`grep -A6 -P '^\[sql\]$' $SETTINGS_FILE | grep -m1 "$mysql_server_key.*=" |\
+                        sed "s/${mysql_server_key}.*=//" | sed -r "s/\s+//g" | sed "s/^'//;s/'$//"`
+    if [ "$mysql_server_value" != "127.0.0.1" ]; then
+        db_set emoncms/mysql_server "$mysql_database_value"
+    fi
+
+    mysql_port_key="port"
+    mysql_port_value=`grep -A6 -P '^\[sql\]$' $SETTINGS_FILE | grep -m1 "$mysql_port_key.*=" |\
+                      sed "s/${mysql_port_key}.*=//" | sed -r "s/\s+//g" | sed "s/^'//;s/'$//"`
+    if [ "$mysql_port_value" != "3306" ]; then
+        db_set emoncms/mysql_port "$mysql_port_value"
+    fi
+
+    mysql_database_key="database"
+    mysql_database_value=`grep -A6 -P '^\[sql\]$' $SETTINGS_FILE | grep -m1 "$mysql_database_key.*=" |\
+                          sed "s/${mysql_database_key}.*=//" | sed -r "s/\s+//g" | sed "s/^'//;s/'$//"`
+    if [ "$mysql_database_value" != "MYSQL_DATABASE" ]; then
+        db_set emoncms/mysql_database "$mysql_database_value"
+    fi
+
+    mysql_user_key="username"
+    mysql_user_value=`grep -A6 -P '^\[sql\]$' $SETTINGS_FILE | grep -m1 "$mysql_user_key.*=" |\
+                      sed "s/${mysql_user_key}.*=//" | sed -r "s/\s+//g" | sed "s/^'//;s/'$//"`
+    if [ "$mysql_user_value" != "MYSQL_USERNAME" ]; then
+        db_set emoncms/mysql_user "$mysql_user_value"
+    fi
+
+    mysql_password_key="password"
+    mysql_password_value=`grep -A6 -P '^\[sql\]$' $SETTINGS_FILE | grep -m1 "$mysql_password_key.*=" |\
+                          sed "s/${mysql_password_key}.*=//" | sed -r "s/\s+//g" | sed "s/^'//;s/'$//"`
+    if [ "$mysql_password_value" != "MYSQL_PASSWORD" ]; then
+        db_set emoncms/mysql_password "$mysql_password_value"
+    fi
+fi
+
+db_input low emoncms/mysql_server || true
+db_input low emoncms/mysql_port || true
+db_input medium emoncms/mysql_database || true
+db_input medium emoncms/mysql_timeseries || true
+
+db_input high emoncms/mysql_user || true
+db_input high emoncms/mysql_password || true
+db_go || true

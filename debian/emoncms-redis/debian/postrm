@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    remove)
+        rm -r /lib/systemd/system/feedwriter.service*
+        rm -r /lib/systemd/system/service-runner.service*
+        ;;
+    *)
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

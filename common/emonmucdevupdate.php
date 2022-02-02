@@ -2,8 +2,6 @@
 // Update Emoncms database
 define('EMONCMS_EXEC', 1);
 
-$applychanges = true;
-
 $options_short = "d:";
 $options_long  = array(
     "dir:"
@@ -48,5 +46,26 @@ if ($mysqli->connect_error) {
 // Set charset to utf8
 $mysqli->set_charset("utf8");
 
-require_once "Lib/dbschemasetup.php";
-print json_encode(db_schema_setup($mysqli, load_db_schema(), $applychanges))."\n";
+if ($settings['redis']['enabled']) {
+    $redis = new Redis();
+    $connected = $redis->connect($settings['redis']['host'], $settings['redis']['port']);
+    if (!$connected) { echo "Can't connect to redis at ".$settings['redis']['host'].":".$settings['redis']['port']." , it may be that redis-server is not installed or started see readme for redis installation"; die; }
+    if (!empty($settings['redis']['prefix'])) $redis->setOption(Redis::OPT_PREFIX, $settings['redis']['prefix']);
+    if (!empty($settings['redis']['auth'])) {
+        if (!$redis->auth($settings['redis']['auth'])) {
+            echo "Can't connect to redis at ".$settings['redis']['host'].", autentication failed"; die;
+        }
+    }
+    if (!empty($settings['redis']['dbnum'])) {
+        $redis->select($settings['redis']['dbnum']);
+    }
+} else {
+    $redis = false;
+}
+
+if ($redis && file_exists("Modules/device/device_model.php")) {
+	require_once "Lib/EmonLogger.php";
+    require_once "Modules/device/device_model.php";
+    $device = new Device($mysqli,$redis);
+    $device->reload_template_list();
+}

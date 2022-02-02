@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+#DEBHELPER#
+
+case "$1" in
+    remove)
+        # Default apache2 configuration
+        a2disconf emoncms.conf
+
+        # Configure virtual host
+        a2dissite emoncms.conf
+        if [ ! "$(ls -A /etc/apache2/sites-enabled)" ]; then
+            a2ensite 000-default.conf
+        fi
+        ;;
+    *)
+        ;;
+esac
+
+exit 0

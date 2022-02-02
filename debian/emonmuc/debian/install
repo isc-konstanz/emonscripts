@@ -1,0 +1,5 @@
+#!/usr/bin/dh-exec
+themes/* <root_dir>/Theme/
+modules/* <root_dir>/Modules/
+device/* /var/opt/emonmuc/device/
+driver/* /var/opt/emonmuc/driver/
