@@ -4,6 +4,13 @@ set -e
 # Source debconf library.
 . /usr/share/debconf/confmodule
 
+db_get emoncms/user
+user=$RET
+if [ -n "$user" ]; then
+    user="root"
+fi
+
+PASSWD_FILE=/home/$user/.setup/passwd.conf
 SETTINGS_FILE=<root_dir>/settings.ini
 
 case "$1" in
@@ -57,26 +64,40 @@ case "$1" in
 esac
 case "$1" in
     install)
+        if test -f $PASSWD_FILE && grep -Fxq "[MySQL]" $PASSWD_FILE; then
+            if grep -A3 -P '^\[MySQL\]' $PASSWD_FILE | grep -m1 -q "$mysql_user_value"; then
+                sed -i "s/$mysql_user_value:.*/$mysql_user_value:$mysql_password_value/" $PASSWD_FILE
+            else
+                sed -i "/[MySQL]/!b;n;a$mysql_user_value:$mysql_password_value" $PASSWD_FILE
+            fi
+            mysql_root_password=`grep -A3 -P "^\[MySQL\]$" $PASSWD_FILE | grep -m1 "root" | sed "s/root://g" | sed -r "s/\s+//g"`
+        fi
+
+        mysql="mysql -uroot"
+        if [ ! -z $mysql_root_password ]; then
+            mysql="$mysql -p$mysql_root_password"
+        fi
+
         # Secure mysql
-        mysql -uroot -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
-        mysql -uroot  -e "DELETE FROM mysql.user WHERE User='';"
-        mysql -uroot  -e "DROP DATABASE IF EXISTS test;"
-        mysql -uroot  -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%';"
+        $mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+        $mysql -e "DELETE FROM mysql.user WHERE User='';"
+        $mysql -e "DROP DATABASE IF EXISTS test;"
+        $mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%';"
 
         # Create the emoncms database using utf8 character decoding:
-        mysql -uroot -e "CREATE DATABASE IF NOT EXISTS $mysql_database_value DEFAULT CHARACTER SET utf8;"
+        $mysql -e "CREATE DATABASE IF NOT EXISTS $mysql_database_value DEFAULT CHARACTER SET utf8;"
 
         # Create the emoncms timeseries using utf8 character decoding:
-        mysql -uroot -e "CREATE DATABASE IF NOT EXISTS $mysql_timeseries_value DEFAULT CHARACTER SET utf8;"
+        $mysql -e "CREATE DATABASE IF NOT EXISTS $mysql_timeseries_value DEFAULT CHARACTER SET utf8;"
 
         # Add emoncms database, set user permissions
-        mysql -uroot -e "CREATE USER IF NOT EXISTS '$mysql_user_value'@'localhost' IDENTIFIED BY '$mysql_password_value';"
-        mysql -uroot -e "GRANT ALL ON $mysql_database_value.* TO '$mysql_user_value'@'localhost';"
+        $mysql -e "CREATE USER IF NOT EXISTS '$mysql_user_value'@'localhost' IDENTIFIED BY '$mysql_password_value';"
+        $mysql -e "GRANT ALL ON $mysql_database_value.* TO '$mysql_user_value'@'localhost';"
         
         if grep -A6 -P "^\[sql\]$" $SETTINGS_FILE | grep -q $mysql_timeseries_key ; then
-            mysql -uroot -e "GRANT ALL ON $mysql_timeseries_value.* TO '$mysql_user_value'@'localhost';"
+            $mysql -e "GRANT ALL ON $mysql_timeseries_value.* TO '$mysql_user_value'@'localhost';"
         fi
-        mysql -uroot -e "FLUSH PRIVILEGES;"
+        $mysql -e "FLUSH PRIVILEGES;"
         ;;
     *)
         ;;
