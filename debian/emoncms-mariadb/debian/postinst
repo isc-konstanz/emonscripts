@@ -60,7 +60,7 @@ case "$1" in
             if grep -A3 -P '^\[MySQL\]' $PASSWD_FILE | grep -m1 -q "$mysql_user_value"; then
                 sed -i "s/$mysql_user_value:.*/$mysql_user_value:$mysql_password_value/" $PASSWD_FILE
             else
-                sed -i "/[MySQL]/!b;n;a$mysql_user_value:$mysql_password_value" $PASSWD_FILE
+                sed -i "/^\[MySQL\]/!b;n;a$mysql_user_value:$mysql_password_value" $PASSWD_FILE
             fi
             mysql_root_password=`grep -A3 -P "^\[MySQL\]$" $PASSWD_FILE | grep -m1 "root" | sed "s/root://g" | sed -r "s/\s+//g"`
         fi
