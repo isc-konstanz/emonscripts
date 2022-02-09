@@ -21,6 +21,8 @@ mkdir -p $package_build
 cp -r $defaults_dir/debian $package_build
 cp -rf $package_dir/debian $package_build
 
+cp $emonscripts_dir/install/emonmuc.php $package_build/scripts/admin/ctrl_setup.php
+
 cp -r $build_tmp/emonmuc/www/* $package_build
 cp -r $build_tmp/emonmuc/lib/device $package_build
 cp -r $build_tmp/emonmuc/lib/driver $package_build

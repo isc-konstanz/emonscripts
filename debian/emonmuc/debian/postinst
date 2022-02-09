@@ -12,9 +12,42 @@ chown -R $user "<root_dir>/Modules/muc"
 chown -R $user "<root_dir>/Modules/channel"
 chown -R $user "<root_dir>/Theme/seal"
 
-#DEBHELPER#
-
 php -f "<root_dir>/scripts/admin/database_update.php"
 php -f "<root_dir>/scripts/admin/device_update.php"
+
+case "$1" in
+    install | configure)
+        openmuc_dir=/opt/openmuc
+        openmuc_user=`stat -c "%U" "$openmuc_dir"/bin/openmuc`
+        openmuc_port_key="org.osgi.service.http.port"
+        openmuc_port=`grep -m 1 $openmuc_port_key $openmuc_dir/conf/system.properties | sed "s/${openmuc_port_key}.*=//;s/^[ \t]*//g"`
+
+        # Wait a while for the server to be available.
+        # TODO: Explore necessity. May be necessary for Raspberry Pi V1
+        printf "Waiting for openmuc service\nPlease wait"
+
+        wait=0
+        while ! nc -z localhost $openmuc_port && [ $wait -lt 60 ]; do
+            wait=$((wait + 3))
+            sleep 3
+            printf "."
+        done
+        while [ $wait -lt 9 ]; do
+            wait=$((wait + 3))
+            sleep 3
+            printf "."
+        done
+        printf "\n"
+
+        php -f "<root_dir>/scripts/admin/ctrl_setup.php" --dir="<root_dir>" --port="$openmuc_port"
+
+        chown -R $openmuc_user -R $openmuc_dir/conf
+        systemctl restart openmuc.service
+        ;;
+    *)
+        ;;
+esac
+
+#DEBHELPER#
 
 exit 0
