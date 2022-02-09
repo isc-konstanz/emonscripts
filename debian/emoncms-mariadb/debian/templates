@@ -1,3 +1,9 @@
+Template: emoncms/user
+Type: string
+Default: root
+Description: Linux user:
+ The name of the linux user, owning all package files
+
 Template: emoncms/mysql_server
 Type: string
 Default: 127.0.0.1

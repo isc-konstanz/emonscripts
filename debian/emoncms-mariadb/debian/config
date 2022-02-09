@@ -62,7 +62,7 @@ db_input medium emoncms/mysql_user || true
 
 db_go || true
 db_get emoncms/mysql_user
-if [ $RET != $mysql_user_value ]; then
+if [ "$RET" != "$mysql_user_value" ]; then
     mysql_user_value=$RET
     mysql_password_value=""
 fi
