@@ -39,7 +39,7 @@ case "$1" in
         done
         printf "\n"
 
-        php -f "<root_dir>/scripts/admin/ctrl_setup.php" --dir="<root_dir>" --port="$openmuc_port"
+        php <root_dir>/scripts/admin/ctrl_setup.php --dir="<root_dir>" --port="$openmuc_port"
 
         chown -R $openmuc_user -R $openmuc_dir/conf
         systemctl restart openmuc.service

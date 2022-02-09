@@ -14,7 +14,7 @@ case "$1" in
             echo -e "\n[Emoncms]" >> $passwd_file
         fi
         emoncms_user="admin"
-        emoncms_password=""
+        emoncms_password="admin"
 
         if grep -A3 -P "^\[Emoncms\]$" $passwd_file | grep -m1 -q "$emoncms_user"; then
             emoncms_password=`grep -A3 -P "^\[Emoncms\]$" $passwd_file | grep -m1 "$emoncms_user:" |\
@@ -24,7 +24,8 @@ case "$1" in
             sed -i "/\[Emoncms\]/a $emoncms_user:$emoncms_password" $passwd_file
         fi
         if [ -n "$emoncms_password" ]; then
-            php -f "<root_dir>/scripts/admin/admin_setup.php" --dir="<root_dir>" --password="$emoncms_password"
+            php <root_dir>/scripts/admin/admin_setup.php --dir="<root_dir>" --password="$emoncms_password"
+            echo "Created emoncms user $emoncms_user:$emoncms_password"
         fi
         ;;
     *)
