@@ -78,9 +78,9 @@ case "$1" in
         $mysql -e "GRANT ALL ON $mysql_database_value.* TO '$mysql_user_value'@'localhost';"
 
         if grep -q "mysqltimeseries" $SETTINGS_FILE; then
-            sed -i "s/.*mysqltimeseries[database].*=.*/mysqltimeseries[database] = '$mysql_timeseries_value'/" $SETTINGS_FILE
-            sed -i "s/.*mysqltimeseries[username].*=.*/mysqltimeseries[username] = '$mysql_user_value'/" $SETTINGS_FILE
-            sed -i "s/.*mysqltimeseries[password].*=.*/mysqltimeseries[password] = '$mysql_password_value'/" $SETTINGS_FILE
+            sed -i "s/.*mysqltimeseries\[database\].*=.*/mysqltimeseries\[database\] = '$mysql_timeseries_value'/" $SETTINGS_FILE
+            sed -i "s/.*mysqltimeseries\[username\].*=.*/mysqltimeseries\[username\] = '$mysql_user_value'/" $SETTINGS_FILE
+            sed -i "s/.*mysqltimeseries\[password\].*=.*/mysqltimeseries\[password\] = '$mysql_password_value'/" $SETTINGS_FILE
 
 	        # Create the emoncms timeseries using utf8 character decoding:
 	        $mysql -e "CREATE DATABASE IF NOT EXISTS $mysql_timeseries_value DEFAULT CHARACTER SET utf8;"
