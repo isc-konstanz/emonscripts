@@ -1,0 +1,30 @@
+#!/bin/sh
+set -e
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+db_get emoncms/user
+user=$RET
+
+passwd_file=/home/$user/.setup/passwd.conf
+if ! grep -q "^\[Emoncms\]$" $passwd_file; then
+    echo -e "\n[Emoncms]" >> $passwd_file
+fi
+emoncms_user="admin"
+emoncms_password=""
+
+if grep -A3 -P "^\[Emoncms\]$" $passwd_file | grep -m1 -q "$emoncms_user"; then
+    emoncms_password=`grep -A3 -P "^\[Emoncms\]$" $passwd_file | grep -m1 "$emoncms_user:" |\
+                    sed "s/$emoncms_user://g" | sed -r "s/\s+//g"`
+elif $(dpkg -l | grep -q -e pwgen); then
+    emoncms_password=$(pwgen -s1 10)
+    sed -i "/\[Emoncms\]/a $emoncms_user:$emoncms_password" $passwd_file
+fi
+if [ -n "$emoncms_password" ]; then
+    php <root_dir>/scripts/admin/admin_setup.php --dir="<root_dir>" --password="$emoncms_password"
+fi
+
+#DEBHELPER#
+
+exit 0

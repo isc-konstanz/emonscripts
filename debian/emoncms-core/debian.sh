@@ -18,6 +18,7 @@ cp -r $build_tmp/emoncms/scripts $package_build
 
 mkdir $package_build/scripts/admin
 cp $emonscripts_dir/common/emoncmsdbupdate.php $package_build/scripts/admin/database_update.php
+cp $emonscripts_dir/install/emoncms_core.php $package_build/scripts/admin/admin_setup.php
 
 cp $build_tmp/emoncms/.htaccess $package_build
 cp $build_tmp/emoncms/version.* $package_build
