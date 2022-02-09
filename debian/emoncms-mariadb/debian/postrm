@@ -1,18 +1,17 @@
 #!/bin/sh
 set -e
 
-# Source debconf library.
-. /usr/share/debconf/confmodule
-
-db_get emoncms/user
-user=$RET
-
-PASSWD_FILE=/home/$user/.setup/passwd.conf
-
 case "$1" in
     purge)
-        if test -f $PASSWD_FILE && grep -Fxq "[MySQL]" $PASSWD_FILE; then
-            mysql_root_password=`grep -A3 -P "^\[MySQL\]$" $PASSWD_FILE | grep -m1 "root" | sed "s/root://g" | sed -r "s/\s+//g"`
+        # Source debconf library.
+        . /usr/share/debconf/confmodule
+
+        db_get emoncms/user
+        user=$RET
+
+        passwd_file=/home/$user/.setup/passwd.conf
+        if test -f $passwd_file && grep -Fxq "[MySQL]" $passwd_file; then
+            mysql_root_password=`grep -A3 -P "^\[MySQL\]$" $passwd_file | grep -m1 "root" | sed "s/root://g" | sed -r "s/\s+//g"`
         fi
 
         mysql="mysql -uroot"

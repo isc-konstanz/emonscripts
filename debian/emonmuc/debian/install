@@ -1,7 +1,7 @@
 #!/usr/bin/dh-exec
 scripts/* <root_dir>/scripts/
 
-core      <root_dir>/Modules/muc
-channel   <root_dir>/Modules/channel
+core/*    <root_dir>/Modules/muc
+channel/* <root_dir>/Modules/channel
 device/*  /var/opt/emonmuc/device/
 driver/*  /var/opt/emonmuc/driver/

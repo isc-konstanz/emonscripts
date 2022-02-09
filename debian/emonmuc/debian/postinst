@@ -10,9 +10,8 @@ user=$RET
 chown -R $user "/var/opt/emonmuc"
 chown -R $user "<root_dir>/Modules/muc"
 chown -R $user "<root_dir>/Modules/channel"
-chown -R $user "<root_dir>/Theme/seal"
 
-php -f "<root_dir>/scripts/admin/database_update.php"
+php -f "<root_dir>/scripts/admin/database_update.php" > /dev/null 2>&1
 php -f "<root_dir>/scripts/admin/device_update.php"
 
 case "$1" in
