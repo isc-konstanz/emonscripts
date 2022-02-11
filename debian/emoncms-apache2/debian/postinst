@@ -5,7 +5,9 @@ set -e
 
 case "$1" in
     install | configure)
-        sed -i "s/^CustomLog/#CustomLog/" /etc/apache2/conf-available/other-vhosts-access-log.conf
+        if ! grep -q '#CustomLog'             /etc/apache2/conf-available/other-vhosts-access-log.conf; then
+            sed -i "s/^CustomLog/#CustomLog/" /etc/apache2/conf-available/other-vhosts-access-log.conf
+        fi
 
         # Enable apache mod rewrite
         a2enmod -q rewrite
@@ -16,6 +18,11 @@ case "$1" in
         # Configure virtual host
         if [ -f /etc/apache2/sites-enabled/000-default.conf ]; then
             a2dissite -q 000-default.conf
+        fi
+        seal_id=$(cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2 | cut -c9-16)
+        seal_domain="$seal_id.seal.isc-konstanz.de"
+        if ! grep -q $seal_domain                               /etc/apache2/sites-available/emoncms.conf; then
+            sed -i "/ServerName/a\    ServerAlias $seal_domain" /etc/apache2/sites-available/emoncms.conf
         fi
         a2ensite -q emoncms.conf
 
