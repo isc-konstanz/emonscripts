@@ -10,7 +10,8 @@ user=$RET
 case "$1" in
     install | configure)
         passwd_file=/home/$user/.setup/passwd.conf
-        if ! grep -q "^\[Emoncms\]$" $passwd_file; then
+        if test -f "$passwd_file" &&\
+            ! grep -q "^\[Emoncms\]$" $passwd_file; then
             echo -e "\n[Emoncms]" >> $passwd_file
         fi
         emoncms_user="admin"
