@@ -9,24 +9,28 @@ user=$RET
 
 case "$1" in
     install | configure)
-        passwd_file=/home/$user/.setup/passwd.conf
-        if test -f "$passwd_file" &&\
-            ! grep -q "^\[Emoncms\]$" $passwd_file; then
-            echo -e "\n[Emoncms]" >> $passwd_file
-        fi
         emoncms_user="admin"
         emoncms_password="admin"
 
-        if grep -A3 -P "^\[Emoncms\]$" $passwd_file | grep -m1 -q "$emoncms_user"; then
-            emoncms_password=`grep -A3 -P "^\[Emoncms\]$" $passwd_file | grep -m1 "$emoncms_user:" |\
-                            sed "s/$emoncms_user://g" | sed -r "s/\s+//g"`
-        elif $(dpkg -l | grep -q -e pwgen); then
-            emoncms_password=$(pwgen -s1 10)
-            sed -i "/\[Emoncms\]/a $emoncms_user:$emoncms_password" $passwd_file
+        passwd_file=/home/$user/.setup/passwd.conf
+        if test -f "$passwd_file"; then
+            if ! grep -q "^\[Emoncms\]$" $passwd_file; then
+                echo -e "\n[Emoncms]" >> $passwd_file
+            fi
+            if grep -A3 -P "^\[Emoncms\]$" $passwd_file | grep -m1 -q "$emoncms_user"; then
+                emoncms_password=`grep -A3 -P "^\[Emoncms\]$" $passwd_file | grep -m1 "$emoncms_user:" |\
+                                sed "s/$emoncms_user://g" | sed -r "s/\s+//g"`
+            elif $(dpkg -l | grep -q -e pwgen); then
+                emoncms_password=$(pwgen -s1 10)
+                sed -i "/\[Emoncms\]/a $emoncms_user:$emoncms_password" $passwd_file
+            fi
         fi
         if [ -n "$emoncms_password" ]; then
             php <root_dir>/scripts/admin/admin_setup.php --dir="<root_dir>" --password="$emoncms_password"
             echo "Created emoncms user $emoncms_user:$emoncms_password"
+            if [ "$emoncms_password" = "admin" ]; then
+                echo "Please make sure to update the admin password to a new, secure phrase"
+            fi
         fi
         ;;
     *)
