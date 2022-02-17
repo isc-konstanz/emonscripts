@@ -36,6 +36,7 @@ case "$1" in
             sleep 3
             printf "."
         done
+        sleep 3
         printf "\n"
 
         php <root_dir>/scripts/admin/ctrl_setup.php --dir="<root_dir>" --port="$openmuc_port"
